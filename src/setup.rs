@@ -42,30 +42,4 @@ fn setup(
         },
         Player,
     ));
-    let rectangle = Mesh2dHandle(meshes.add(Rectangle {
-        half_size: Vec2::new(100.0, 100.0),
-    }));
-    commands.spawn((
-        RigidBody::Static,
-        Friction::new(0.0),
-        Restitution::new(1.0),
-        GravityScale(0.0),
-        Rotation::from_degrees(0.0),
-        Collider::rectangle(200.0, 200.0),
-        LinearVelocity(Vec2::new(0.0, 0.0)),
-        MaterialMesh2dBundle {
-            mesh: rectangle,
-            material: materials.add(Color::rgb(1.0, 0.0, 0.0)),
-            transform: Transform {
-                translation: Vec3 {
-                    x: 0.0,
-                    // add offset to prevent ball from getting stuck
-                    y: 300.0,
-                    z: 0.0,
-                },
-                ..Transform::default()
-            },
-            ..default()
-        },
-    ));
 }
