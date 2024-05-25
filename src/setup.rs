@@ -10,6 +10,14 @@ pub struct SetupPlugin;
 pub struct Player;
 
 #[derive(Component)]
+pub struct PlayerStats {
+    pub health: f32,
+    pub attack: f32,
+    pub defense: f32,
+    pub attack_range: f32,
+}
+
+#[derive(Component)]
 pub struct Camera;
 
 impl Plugin for SetupPlugin {
@@ -41,5 +49,11 @@ fn setup(
             ..default()
         },
         Player,
+        PlayerStats {
+            health: 100.0,
+            attack: 10.0,
+            defense: 5.0,
+            attack_range: 20.0,
+        },
     ));
 }

@@ -26,12 +26,12 @@ pub struct GoblinBundle {
 
 impl Plugin for SpawnGoblinPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, spawn_goblin);
+        app.add_systems(Update, spawn);
     }
 }
 
 
-fn spawn_goblin(
+fn spawn(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,
@@ -41,7 +41,6 @@ fn spawn_goblin(
         let rectangle = Mesh2dHandle(meshes.add(Rectangle {
             half_size: Vec2::new(10.0, 10.0),
         }));
-        println!("Spawning goblin at {:?}", event.0);
         commands.spawn(GoblinBundle {
             rigid_body: RigidBody::Static,
             collider: Collider::rectangle(20.0, 20.0),
