@@ -1,7 +1,8 @@
 use bevy_xpbd_2d::prelude::*;
 use bevy::{
     prelude::*,
-    sprite::{MaterialMesh2dBundle, Mesh2dHandle},
+    sprite::{MaterialMesh2dBundle, Mesh2dHandle}, time::Stopwatch,
+    utils::Duration,
 };
 
 pub struct SetupPlugin;
@@ -12,9 +13,11 @@ pub struct Player;
 #[derive(Component)]
 pub struct PlayerStats {
     pub health: f32,
-    pub attack: f32,
-    pub defense: f32,
+    pub attack_damage: f32,
+    pub armor: f32,
     pub attack_range: f32,
+    pub attack_speed: f32,
+    pub attack_timer: Stopwatch,
 }
 
 #[derive(Component)]
@@ -34,6 +37,8 @@ fn setup(
 ) {
     let radius = 10.0;
     let ball = Mesh2dHandle(meshes.add(Circle { radius }));
+    let mut stopwatch = Stopwatch::new();
+    stopwatch.set_elapsed(Duration::from_secs_f32(1.0));
     commands.spawn((Camera2dBundle::default(), Camera));
     commands.spawn((
         RigidBody::Kinematic,
@@ -51,9 +56,10 @@ fn setup(
         Player,
         PlayerStats {
             health: 100.0,
-            attack: 10.0,
-            defense: 5.0,
+            attack_damage: 10.0,
+            armor: 5.0,
             attack_range: 20.0,
-        },
-    ));
+            attack_speed: 1.0,
+            attack_timer: stopwatch,
+        },));
 }

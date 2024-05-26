@@ -52,13 +52,13 @@ fn spawn(
             goblin: Goblin,
             mob: Mob {
                 mob_type: MobType::Goblin,
-                health: 100.0,
+                health: 30.0,
                 movement_speed: 1.0,
                 view_range: 300.0,
                 attack_range: 20.0,
                 attack_damage: 10.0,
                 attack_speed: 1.0,
-                armor: 0,
+                armor: 0.0,
                 move_speed: 5000.0,
             },
         });

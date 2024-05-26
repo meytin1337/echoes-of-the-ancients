@@ -8,7 +8,9 @@ use crate::setup::PlayerStats;
 pub struct PlayerMoveEvent(pub Vec2);
 
 #[derive(Event)]
-pub struct PlayerAttackEvent;
+pub struct PlayerAttackEvent {
+    pub target: Entity,
+}
 
 #[derive(Component)]
 pub struct Targeted;
@@ -27,7 +29,7 @@ fn handle_input(
     button_input: Res<ButtonInput<MouseButton>>,
     window_query: Query<&Window>,
     camera_query: Query<(&Camera, &GlobalTransform), With<Camera>>,
-    mob_query: Query<(&GlobalTransform, &Transform, &Collider), With<Targeted>>,
+    mob_query: Query<(Entity, &GlobalTransform, &Transform, &Collider), With<Targeted>>,
     player_query: Query<(&PlayerStats, &GlobalTransform)>,
 ) {
     let (camera, camera_transform) = camera_query.single();
@@ -38,7 +40,7 @@ fn handle_input(
             .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor))
         {
             let (player_stats, player_global_transform) = player_query.single();
-            if let Ok((mob_global_transform, mob_transform, mob_collider)) = mob_query.get_single()
+            if let Ok((mob_entity, mob_global_transform, mob_transform, mob_collider)) = mob_query.get_single()
             {
                 // if mob is in attack range, attack it
                 // otherwise move towards it
@@ -48,7 +50,9 @@ fn handle_input(
                     player_global_transform.translation().truncate(),
                     true,
                 ) <= player_stats.attack_range {
-                    player_attack_event_writer.send(PlayerAttackEvent);
+                    player_attack_event_writer.send(PlayerAttackEvent {
+                        target: mob_entity,
+                    });
                 } else {
                     player_move_event_writer.send(PlayerMoveEvent(
                         mob_global_transform.translation().truncate(),

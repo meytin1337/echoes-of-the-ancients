@@ -12,7 +12,7 @@ pub struct Mob {
     pub attack_range: f32,
     pub attack_damage: f32,
     pub attack_speed: f32,
-    pub armor: i32,
+    pub armor: f32,
     pub mob_type: MobType,
     pub move_speed: f32,
 }

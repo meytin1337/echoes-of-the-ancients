@@ -17,7 +17,7 @@ pub struct GeneralMobBehaviourPlugin;
 
 impl Plugin for GeneralMobBehaviourPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (attack_player, mob_move))
+        app.add_systems(Update, (attack_player, mob_run_to_player, apply_mob_movement_damping))
             .add_event::<MobMoveEvent>();
     }
 }
@@ -37,7 +37,6 @@ fn attack_player(
             true,
         ) <= mob_stats.attack_range
         {
-            println!("Mob attacking");
             match mob_stats.mob_type {
                 MobType::Goblin => {
                     goblin_attack_event_writer.send(GoblinAttackEvent {
@@ -54,7 +53,7 @@ fn attack_player(
     }
 }
 
-fn mob_move(
+fn mob_run_to_player(
     mut mob_move_event_reader: EventReader<MobMoveEvent>,
     mut mob_query: Query<(&GlobalTransform, &mut LinearVelocity, &Mob)>,
     time: Res<Time>,
@@ -63,7 +62,6 @@ fn mob_move(
         if let Ok((global_transform, mut linear_velocity, mob_state)) =
             mob_query.get_mut(event.mob_entity)
         {
-            println!("Mob moving");
             let direction = Vec2::new(
                 event.target_position.x - global_transform.translation().x,
                 event.target_position.y - global_transform.translation().y,
@@ -77,8 +75,9 @@ fn mob_move(
     }
 }
 
-fn apply_movement_damping(mut linear_velocity_query: Query<&mut LinearVelocity, With<Mob>>) {
-    let mut linear_velocity = linear_velocity_query.single_mut();
-    linear_velocity.x *= 0.5;
-    linear_velocity.y *= 0.5;
+fn apply_mob_movement_damping(mut linear_velocity_query: Query<&mut LinearVelocity, With<Mob>>) {
+    for mut linear_velocity in &mut linear_velocity_query {
+        linear_velocity.x *= 0.5;
+        linear_velocity.y *= 0.5;
+    }
 }
