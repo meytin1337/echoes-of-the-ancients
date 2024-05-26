@@ -36,7 +36,7 @@ fn setup(
     let ball = Mesh2dHandle(meshes.add(Circle { radius }));
     commands.spawn((Camera2dBundle::default(), Camera));
     commands.spawn((
-        RigidBody::Dynamic,
+        RigidBody::Kinematic,
         Friction::new(0.0),
         Restitution::new(1.0),
         GravityScale(0.0),

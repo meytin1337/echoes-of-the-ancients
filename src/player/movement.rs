@@ -17,18 +17,14 @@ impl Plugin for MovementPlugin {
     }
 }
 
-// todo: use time delta for movement
 fn run(
     mut player_move_event_reader: EventReader<PlayerMoveEvent>,
-    mut player_linear_velocity_query: Query<&mut LinearVelocity, With<Player>>,
-    player_query: Query<(&GlobalTransform, &Transform), With<Player>>,
+    mut player_query: Query<(&GlobalTransform, &Transform, &mut LinearVelocity), With<Player>>,
     time: Res<Time>,
     mut camera_move_event_writer: EventWriter<CameraMoveEvent>,
 ) {
     for event in player_move_event_reader.read() {
-        let mut linear_velocity = player_linear_velocity_query.single_mut();
-        let (global_transform, transform) = player_query.single();
-        // todo: convert cursor to world coordinates: https://bevy-cheatbook.github.io/cookbook/cursor2world.html
+        let (global_transform, transform, mut linear_velocity) = player_query.single_mut();
         let direction = Vec2::new(
             event.0.x - global_transform.translation().x,
             event.0.y - global_transform.translation().y,

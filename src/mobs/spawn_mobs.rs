@@ -5,7 +5,22 @@ use crate::game_state::Location;
 pub struct SpawnMobsPlugin;
 
 #[derive(Component)]
-pub struct Mob;
+pub struct Mob {
+    pub health: f32,
+    pub movement_speed: f32,
+    pub view_range: f32,
+    pub attack_range: f32,
+    pub attack_damage: f32,
+    pub attack_speed: f32,
+    pub armor: i32,
+    pub mob_type: MobType,
+    pub move_speed: f32,
+}
+
+#[derive(Clone)]
+pub enum MobType {
+    Goblin,
+}
 
 #[derive(Event)]
 pub struct SpawnGoblinEvent(pub Vec3);

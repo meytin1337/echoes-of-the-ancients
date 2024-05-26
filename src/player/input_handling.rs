@@ -4,7 +4,6 @@ use bevy_xpbd_2d::plugins::collision::Collider;
 
 use crate::mobs::spawn_mobs::Mob;
 use crate::setup::PlayerStats;
-
 #[derive(Event)]
 pub struct PlayerMoveEvent(pub Vec2);
 
@@ -50,7 +49,6 @@ fn handle_input(
                     true,
                 ) <= player_stats.attack_range {
                     player_attack_event_writer.send(PlayerAttackEvent);
-                    println!("Attacking mob");
                 } else {
                     player_move_event_writer.send(PlayerMoveEvent(
                         mob_global_transform.translation().truncate(),
