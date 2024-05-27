@@ -2,6 +2,7 @@ use bevy_xpbd_2d::prelude::*;
 use bevy::{
     prelude::*,
     sprite::{MaterialMesh2dBundle, Mesh2dHandle},
+    time::Stopwatch,
 };
 use crate::mobs::spawn_mobs::{Mob, SpawnGoblinEvent, MobType};
 
@@ -51,6 +52,7 @@ fn spawn(
             },
             goblin: Goblin,
             mob: Mob {
+                attack_timer: Stopwatch::new(),
                 mob_type: MobType::Goblin,
                 health: 30.0,
                 movement_speed: 1.0,

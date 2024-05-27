@@ -1,12 +1,11 @@
 use crate::mobs::goblin::attack::GoblinAttackEvent;
+use crate::mobs::combat::attack::MobAttackEvent;
 use crate::mobs::spawn_mobs::Mob;
 use crate::mobs::spawn_mobs::MobType;
 use crate::setup::Player;
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
 
-#[derive(Component)]
-pub struct Attacking;
 #[derive(Event)]
 pub struct MobMoveEvent {
     pub mob_entity: Entity,
@@ -27,6 +26,7 @@ fn attack_player(
     mob_query: Query<(Entity, &Transform, &Collider, &Mob)>,
     mut goblin_attack_event_writer: EventWriter<GoblinAttackEvent>,
     mut mob_move_event_writer: EventWriter<MobMoveEvent>,
+    mut mob_attack_event_writer: EventWriter<MobAttackEvent>,
 ) {
     for (mob_entity, mob_transform, mob_collider, mob_stats) in &mob_query {
         let player_global_transform = player_query.single();
@@ -37,6 +37,9 @@ fn attack_player(
             true,
         ) <= mob_stats.attack_range
         {
+            mob_attack_event_writer.send(MobAttackEvent {
+                mob_entity,
+            });
             match mob_stats.mob_type {
                 MobType::Goblin => {
                     goblin_attack_event_writer.send(GoblinAttackEvent {
@@ -59,7 +62,7 @@ fn mob_run_to_player(
     time: Res<Time>,
 ) {
     for event in mob_move_event_reader.read() {
-        if let Ok((global_transform, mut linear_velocity, mob_state)) =
+        if let Ok((global_transform, mut linear_velocity, mob_stats)) =
             mob_query.get_mut(event.mob_entity)
         {
             let direction = Vec2::new(
@@ -68,9 +71,9 @@ fn mob_run_to_player(
             );
             let normalized_direction = direction.normalize();
             linear_velocity.x =
-                normalized_direction.x * mob_state.move_speed * time.delta_seconds();
+                normalized_direction.x * mob_stats.move_speed * time.delta_seconds();
             linear_velocity.y =
-                normalized_direction.y * mob_state.move_speed * time.delta_seconds();
+                normalized_direction.y * mob_stats.move_speed * time.delta_seconds();
         }
     }
 }

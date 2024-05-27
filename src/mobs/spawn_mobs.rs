@@ -1,5 +1,7 @@
 use bevy::prelude::*;
 
+use bevy::time::Stopwatch;
+
 use crate::game_state::Location;
 
 pub struct SpawnMobsPlugin;
@@ -12,6 +14,7 @@ pub struct Mob {
     pub attack_range: f32,
     pub attack_damage: f32,
     pub attack_speed: f32,
+    pub attack_timer: Stopwatch,
     pub armor: f32,
     pub mob_type: MobType,
     pub move_speed: f32,

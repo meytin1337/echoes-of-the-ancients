@@ -2,7 +2,6 @@ use bevy_xpbd_2d::prelude::*;
 use bevy::{
     prelude::*,
     sprite::{MaterialMesh2dBundle, Mesh2dHandle}, time::Stopwatch,
-    utils::Duration,
 };
 
 pub struct SetupPlugin;
@@ -37,8 +36,6 @@ fn setup(
 ) {
     let radius = 10.0;
     let ball = Mesh2dHandle(meshes.add(Circle { radius }));
-    let mut stopwatch = Stopwatch::new();
-    stopwatch.set_elapsed(Duration::from_secs_f32(1.0));
     commands.spawn((Camera2dBundle::default(), Camera));
     commands.spawn((
         RigidBody::Kinematic,
@@ -60,6 +57,6 @@ fn setup(
             armor: 5.0,
             attack_range: 20.0,
             attack_speed: 1.0,
-            attack_timer: stopwatch,
+            attack_timer: Stopwatch::new(),
         },));
 }

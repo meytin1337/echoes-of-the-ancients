@@ -4,8 +4,8 @@ use crate::mobs::spawn_mobs::Mob;
 use crate::player::input_handling::PlayerAttackEvent;
 use crate::setup::PlayerStats;
 
-pub struct MeleeAttackPlugin;
-impl Plugin for MeleeAttackPlugin {
+pub struct PlayerAttackPlugin;
+impl Plugin for PlayerAttackPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, attack);
     }
@@ -18,17 +18,18 @@ fn attack(
     mut player_query: Query<&mut PlayerStats>,
     time: Res<Time>,
 ) {
+    let mut player_stats = player_query.single_mut();
+    player_stats.attack_timer.tick(time.delta());
     for event in player_attack_event_reader.read() {
-        let mut player_stats = player_query.single_mut();
-        player_stats.attack_timer.tick(time.delta());
-        if let Ok(mut mob_state) = mob_query.get_mut(event.target) {
+        if let Ok(mut mob_stats) = mob_query.get_mut(event.target) {
+            println!("Player attacked mob {:?}", player_stats.attack_timer.elapsed_secs());
             if player_stats.attack_timer.elapsed_secs() > player_stats.attack_speed {
-                println!("Attacking mob");
-                player_stats.attack_timer.reset();
-                mob_state.health -= player_stats.attack_damage - mob_state.armor;
-                if mob_state.health <= 0.0 {
+                mob_stats.health -= player_stats.attack_damage - mob_stats.armor;
+                println!("Mob health: {}", mob_stats.health);
+                if mob_stats.health <= 0.0 {
                     command.entity(event.target).despawn();
                 }
+                player_stats.attack_timer.reset();
             }
         }
     }

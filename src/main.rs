@@ -1,7 +1,7 @@
 use crate::game_state::Location;
 use crate::mobs::goblin::{attack::GoblinAttackPlugin, spawn_goblin::SpawnGoblinPlugin};
 use crate::mobs::{general_mob_behaviour::GeneralMobBehaviourPlugin, spawn_mobs::SpawnMobsPlugin};
-use crate::player::{input_handling::InputHandlingPlugin, movement::MovementPlugin, melee_attack::MeleeAttackPlugin};
+use crate::player::{attack::PlayerAttackPlugin, input_handling::InputHandlingPlugin, movement::PlayerMovementPlugin};
 use bevy::prelude::*;
 use bevy_embedded_assets::EmbeddedAssetPlugin;
 use bevy_xpbd_2d::prelude::*;
@@ -18,13 +18,14 @@ fn main() {
             EmbeddedAssetPlugin::default(),
             PhysicsPlugins::default(),
             InputHandlingPlugin,
-            MovementPlugin,
+            PlayerMovementPlugin,
             setup::SetupPlugin,
             SpawnGoblinPlugin,
             SpawnMobsPlugin,
             GoblinAttackPlugin,
             GeneralMobBehaviourPlugin,
-            MeleeAttackPlugin,
+            PlayerAttackPlugin,
+            mobs::combat::attack::MobAttackPlugin,
         ))
         .insert_state(Location::Floor1)
         .run();

@@ -8,8 +8,8 @@ use crate::setup::{Camera, Player};
 pub struct CameraMoveEvent(pub Vec3);
 
 
-pub struct MovementPlugin;
-impl Plugin for MovementPlugin {
+pub struct PlayerMovementPlugin;
+impl Plugin for PlayerMovementPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(Update, (run, apply_movement_damping, center_camera))
             .add_event::<PlayerMoveEvent>()
