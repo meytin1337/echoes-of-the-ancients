@@ -1,7 +1,6 @@
 use crate::mobs::goblin::attack::GoblinAttackEvent;
 use crate::mobs::combat::attack::MobAttackEvent;
-use crate::mobs::spawn_mobs::Mob;
-use crate::mobs::spawn_mobs::MobType;
+use crate::mobs::spawn_mobs::{Mob, MobType, DeadMob};
 use crate::setup::Player;
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
@@ -23,7 +22,7 @@ impl Plugin for GeneralMobBehaviourPlugin {
 
 fn attack_player(
     player_query: Query<&GlobalTransform, With<Player>>,
-    mob_query: Query<(Entity, &Transform, &Collider, &Mob)>,
+    mob_query: Query<(Entity, &Transform, &Collider, &Mob), Without<DeadMob>>,
     mut goblin_attack_event_writer: EventWriter<GoblinAttackEvent>,
     mut mob_move_event_writer: EventWriter<MobMoveEvent>,
     mut mob_attack_event_writer: EventWriter<MobAttackEvent>,
@@ -58,7 +57,7 @@ fn attack_player(
 
 fn mob_run_to_player(
     mut mob_move_event_reader: EventReader<MobMoveEvent>,
-    mut mob_query: Query<(&GlobalTransform, &mut LinearVelocity, &Mob)>,
+    mut mob_query: Query<(&GlobalTransform, &mut LinearVelocity, &Mob), Without<DeadMob>>,
     time: Res<Time>,
 ) {
     for event in mob_move_event_reader.read() {

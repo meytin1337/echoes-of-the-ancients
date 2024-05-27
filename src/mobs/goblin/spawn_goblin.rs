@@ -52,6 +52,8 @@ fn spawn(
             },
             goblin: Goblin,
             mob: Mob {
+                item_drop_chance: 0.5,
+                death_timer: Stopwatch::new(),
                 attack_timer: Stopwatch::new(),
                 mob_type: MobType::Goblin,
                 health: 30.0,

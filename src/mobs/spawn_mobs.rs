@@ -18,7 +18,12 @@ pub struct Mob {
     pub armor: f32,
     pub mob_type: MobType,
     pub move_speed: f32,
+    pub death_timer: Stopwatch,
+    pub item_drop_chance: f32,
 }
+
+#[derive(Component)]
+pub struct DeadMob;
 
 #[derive(Clone)]
 pub enum MobType {
