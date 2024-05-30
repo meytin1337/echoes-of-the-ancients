@@ -21,17 +21,13 @@ pub struct MobsPlugin;
 impl Plugin for MobsPlugin {
     fn build(&self, app: &mut App) {
         app.add_systems(OnEnter(Location::Floor1), floor_1_spawner)
-            .add_event::<SpawnGoblinEvent>();
-        app.add_systems(
+        .add_systems(
             Update,
-            (target_player, run_to_player, apply_mob_movement_damping),
-        )
-        .add_event::<MobMoveEvent>();
-        app.add_systems(Update, (attack_player, tick_mob_attack_timer))
-            .add_event::<MobAttackEvent>();
-        app.add_systems(Update, spawn_goblin)
-            .add_event::<SpawnGoblinEvent>();
-        app.add_systems(Update, goblin_attack)
-            .add_event::<GoblinAttackEvent>();
+            (target_player, run_to_player, apply_mob_movement_damping, attack_player, tick_mob_attack_timer, goblin_attack, spawn_goblin).in_set(crate::sets::PlayingSet))
+            .add_event::<SpawnGoblinEvent>()
+            .add_event::<MobAttackEvent>()
+            .add_event::<SpawnGoblinEvent>()
+            .add_event::<GoblinAttackEvent>()
+            .add_event::<MobMoveEvent>();
     }
 }

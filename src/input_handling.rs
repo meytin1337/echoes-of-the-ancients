@@ -2,9 +2,11 @@ use bevy::input::mouse::MouseButtonInput;
 use bevy::{prelude::*, input::keyboard::KeyCode};
 use bevy_xpbd_2d::plugins::collision::Collider;
 use crate::items::drop::Item;
+use crate::states::GameState;
 
 use crate::mobs::spawn_mobs::Mob;
-use crate::player::spawn_player::PlayerStats;
+use crate::player::PlayerStats;
+use crate::player::spawn_player::Player;
 #[derive(Event)]
 pub struct PlayerMoveEvent(pub Vec2);
 
@@ -24,7 +26,7 @@ pub struct Targeted;
 pub struct InputHandlingPlugin;
 impl Plugin for InputHandlingPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (target_mob_or_item, release_targeted_mob_or_item, handle_input))
+        app.add_systems(Update, (target_mob_or_item, release_targeted_mob_or_item, handle_mouse_click, toggle_inventory))
             .add_event::<PlayerMoveEvent>()
             .add_event::<PlayerAttackEvent>()
             .add_event::<ItemPickUpEvent>();
@@ -33,11 +35,23 @@ impl Plugin for InputHandlingPlugin {
 
 fn toggle_inventory(
     keys: Res<ButtonInput<KeyCode>>,
+    app_state: ResMut<State<GameState>>,
+    mut next_state: ResMut<NextState<GameState>>,
 ) {
     if keys.just_pressed(KeyCode::KeyI) {
+        match app_state.get() {
+            GameState::Playing => {
+                next_state.set(GameState::Inventory);
+            }
+            GameState::Inventory => {
+                next_state.set(GameState::Playing);
+            }
+            GameState::Paused => (),
+        }
     }
 }
-fn handle_input(
+
+fn handle_mouse_click(
     mut player_move_event_writer: EventWriter<PlayerMoveEvent>,
     mut player_attack_event_writer: EventWriter<PlayerAttackEvent>,
     mut item_pick_up_event_writer: EventWriter<ItemPickUpEvent>,
@@ -46,7 +60,8 @@ fn handle_input(
     camera_query: Query<(&Camera, &GlobalTransform), With<Camera>>,
     mob_query: Query<(Entity, &GlobalTransform, &Transform, &Collider), (With<Targeted>, With<Mob>)>,
     item_query: Query<(Entity, &GlobalTransform, &Transform, &Collider), (With<Targeted>, With<Item>)>,
-    player_query: Query<(&PlayerStats, &GlobalTransform)>,
+    player_query: Query<&GlobalTransform, With<Player>>,
+    player_stats: Res<PlayerStats>,
 ) {
     let (camera, camera_transform) = camera_query.single();
     if button_input.pressed(MouseButton::Left) {
@@ -55,7 +70,7 @@ fn handle_input(
             .cursor_position()
             .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor))
         {
-            let (player_stats, player_global_transform) = player_query.single();
+            let player_global_transform = player_query.single();
             if let Ok((mob_entity, mob_global_transform, mob_transform, mob_collider)) = mob_query.get_single()
             {
                 // if mob is in attack range, attack it

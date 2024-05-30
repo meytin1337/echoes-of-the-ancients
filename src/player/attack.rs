@@ -2,7 +2,8 @@ use bevy::prelude::*;
 
 use crate::mobs::spawn_mobs::{Mob, DeadMob};
 use crate::input_handling::{PlayerAttackEvent, Targeted};
-use crate::player::spawn_player::PlayerStats;
+
+use crate::player::PlayerStats;
 
 #[derive(Event)]
 pub struct MobKillEvent(pub Entity);
@@ -16,10 +17,9 @@ pub fn attack(
     mut item_drop_event_writer: EventWriter<ItemDropEvent>, 
     mut mob_query: Query<&mut Mob>,
     mut commands: Commands,
-    mut player_query: Query<&mut PlayerStats>,
+    mut player_stats: ResMut<PlayerStats>,
     time: Res<Time>,
 ) {
-    let mut player_stats = player_query.single_mut();
     player_stats.attack_timer.tick(time.delta());
     for event in player_attack_event_reader.read() {
         if let Ok(mut mob_stats) = mob_query.get_mut(event.target) {

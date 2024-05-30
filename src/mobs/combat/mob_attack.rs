@@ -1,7 +1,7 @@
 use bevy::prelude::*;
 
 use crate::mobs::spawn_mobs::Mob;
-use crate::player::spawn_player::PlayerStats;
+use crate::player::PlayerStats;
 
 #[derive(Event)]
 pub struct MobAttackEvent {
@@ -10,11 +10,10 @@ pub struct MobAttackEvent {
 
 pub fn attack_player(
     mut mob_melee_attack_event_reader: EventReader<MobAttackEvent>,
-    mut player_query: Query<&mut PlayerStats>,
+    mut player_stats: ResMut<PlayerStats>,
     mut mob_query: Query<&mut Mob>,
 ) {
     // always tick time so that first attack on mobs will be instant
-    let mut player_stats = player_query.single_mut();
     for event in mob_melee_attack_event_reader.read() {
         if let Ok(mut mob_stats) = mob_query.get_mut(event.mob_entity) {
             if mob_stats.attack_timer.elapsed_secs() > mob_stats.attack_speed {

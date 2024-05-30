@@ -5,8 +5,8 @@ use bevy::{
     sprite::{ColorMaterial, MaterialMesh2dBundle, Mesh2dHandle},
 };
 use bevy_xpbd_2d::plugins::collision::Collider;
-use rand::prelude::*;
 use rand::distributions::{Bernoulli, Distribution};
+use rand::prelude::*;
 
 #[derive(Bundle)]
 pub struct ItemBundle {
@@ -16,37 +16,30 @@ pub struct ItemBundle {
 }
 
 #[derive(Component)]
-pub enum Item {
-    Armor(Armor),
-    Weapon(Weapon),
+pub struct Item {
+    pub item_stats: ItemStats,
+    pub name: String,
 }
 
-pub struct Armor {
-    first_armor_stat: Option<ArmorStats>,
-    second_armor_stat: Option<ArmorStats>,
-    third_armor_stat: Option<ArmorStats>,
+pub enum ItemStats {
+    Armor(ArmorStats),
+    Weapon(WeaponStats),
 }
 
-pub struct Weapon {
-    first_weapon_stat: Option<WeaponStats>,
-    second_weapon_stat: Option<WeaponStats>,
-    third_weapon_stat: Option<WeaponStats>,
+pub struct ArmorStats {
+    pub health: Option<f32>,
+    pub armor: Option<f32>,
+    pub movement_speed: Option<f32>,
 }
 
-pub enum ArmorStats {
-    Health(f32),
-    Mana(f32),
-    Armor(f32),
-}
-
-pub enum WeaponStats {
-    AttackDamage(f32),
-    AttackSpeed(f32),
-    FireDamage(f32),
+pub struct WeaponStats {
+    pub fire_damage: Option<f32>,
+    pub ice_damage: Option<f32>,
+    pub poison_damage: Option<f32>,
+    pub attack_speed: Option<f32>,
 }
 
 pub struct DropPlugin;
-
 
 pub fn drop_item(
     mut commands: Commands,
@@ -59,18 +52,21 @@ pub fn drop_item(
     let item_random_number: f32 = rng.gen();
     for event in item_drop_event_reader.read() {
         if let Ok((mob_stats, mob_transform)) = mob_query.get(event.0) {
-            // fix this, we want 
+            // fix this, we want
             let drop_distribution = Bernoulli::new(mob_stats.item_drop_chance as f64).unwrap();
             if drop_distribution.sample(&mut rng) {
                 // todo: randomize item stats
                 if item_random_number > 0.5 {
                     commands.spawn(ItemBundle {
                         collider: Collider::rectangle(20.0, 20.0),
-                        item: Item::Armor(Armor {
-                            first_armor_stat: Some(ArmorStats::Health(10.0)),
-                            second_armor_stat: Some(ArmorStats::Armor(5.0)),
-                            third_armor_stat: None,
-                        }),
+                        item: Item {
+                            item_stats: ItemStats::Armor(ArmorStats {
+                                health: Some(10.0),
+                                armor: Some(10.0),
+                                movement_speed: Some(1.0),
+                            }),
+                            name: String::from("test"),
+                        },
                         material_mesh_2d_bundle: MaterialMesh2dBundle {
                             mesh: Mesh2dHandle(meshes.add(Rectangle {
                                 half_size: Vec2::new(10.0, 10.0),
@@ -86,11 +82,15 @@ pub fn drop_item(
                 } else {
                     commands.spawn(ItemBundle {
                         collider: Collider::rectangle(20.0, 20.0),
-                        item: Item::Weapon(Weapon {
-                            first_weapon_stat: Some(WeaponStats::AttackDamage(10.0)),
-                            second_weapon_stat: Some(WeaponStats::AttackSpeed(1.0)),
-                            third_weapon_stat: None,
-                        }),
+                        item: Item {
+                            item_stats: ItemStats::Weapon(WeaponStats {
+                                fire_damage: Some(10.0),
+                                ice_damage: Some(10.0),
+                                poison_damage: Some(10.0),
+                                attack_speed: Some(1.0),
+                            }),
+                            name: String::from("test_weapon"),
+                        },
                         material_mesh_2d_bundle: MaterialMesh2dBundle {
                             mesh: Mesh2dHandle(meshes.add(Rectangle {
                                 half_size: Vec2::new(10.0, 10.0),
