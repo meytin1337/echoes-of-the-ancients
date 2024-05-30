@@ -1,15 +1,16 @@
 use crate::mobs::spawn_mobs::Mob;
 use crate::player::attack::ItemDropEvent;
-use crate::setup::{Player, PlayerStats};
 use bevy::{
     prelude::*,
     sprite::{ColorMaterial, MaterialMesh2dBundle, Mesh2dHandle},
 };
+use bevy_xpbd_2d::plugins::collision::Collider;
 use rand::prelude::*;
 use rand::distributions::{Bernoulli, Distribution};
 
 #[derive(Bundle)]
 pub struct ItemBundle {
+    pub collider: Collider,
     pub item: Item,
     pub material_mesh_2d_bundle: MaterialMesh2dBundle<ColorMaterial>,
 }
@@ -69,6 +70,7 @@ fn drop_item(
                 // todo: randomize item stats
                 if item_random_number > 0.5 {
                     commands.spawn(ItemBundle {
+                        collider: Collider::rectangle(20.0, 20.0),
                         item: Item::Armor(Armor {
                             first_armor_stat: Some(ArmorStats::Health(10.0)),
                             second_armor_stat: Some(ArmorStats::Armor(5.0)),
@@ -88,6 +90,7 @@ fn drop_item(
                     });
                 } else {
                     commands.spawn(ItemBundle {
+                        collider: Collider::rectangle(20.0, 20.0),
                         item: Item::Weapon(Weapon {
                             first_weapon_stat: Some(WeaponStats::AttackDamage(10.0)),
                             second_weapon_stat: Some(WeaponStats::AttackSpeed(1.0)),

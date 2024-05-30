@@ -1,6 +1,7 @@
 use bevy::input::mouse::MouseButtonInput;
 use bevy::prelude::*;
 use bevy_xpbd_2d::plugins::collision::Collider;
+use crate::items::drop::Item;
 
 use crate::mobs::spawn_mobs::Mob;
 use crate::setup::PlayerStats;
@@ -12,24 +13,32 @@ pub struct PlayerAttackEvent {
     pub target: Entity,
 }
 
+#[derive(Event)]
+pub struct ItemPickUpEvent {
+    pub item: Entity,
+}
+
 #[derive(Component)]
 pub struct Targeted;
 
 pub struct InputHandlingPlugin;
 impl Plugin for InputHandlingPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (target_mob, release_targeted_mob, handle_input))
+        app.add_systems(Update, (target_mob_or_item, release_targeted_mob_or_item, handle_input))
             .add_event::<PlayerMoveEvent>()
-            .add_event::<PlayerAttackEvent>();
+            .add_event::<PlayerAttackEvent>()
+            .add_event::<ItemPickUpEvent>();
     }
 }
 fn handle_input(
     mut player_move_event_writer: EventWriter<PlayerMoveEvent>,
     mut player_attack_event_writer: EventWriter<PlayerAttackEvent>,
+    mut item_pick_up_event_writer: EventWriter<ItemPickUpEvent>,
     button_input: Res<ButtonInput<MouseButton>>,
     window_query: Query<&Window>,
     camera_query: Query<(&Camera, &GlobalTransform), With<Camera>>,
-    mob_query: Query<(Entity, &GlobalTransform, &Transform, &Collider), With<Targeted>>,
+    mob_query: Query<(Entity, &GlobalTransform, &Transform, &Collider), (With<Targeted>, With<Mob>)>,
+    item_query: Query<(Entity, &GlobalTransform, &Transform, &Collider), (With<Targeted>, With<Item>)>,
     player_query: Query<(&PlayerStats, &GlobalTransform)>,
 ) {
     let (camera, camera_transform) = camera_query.single();
@@ -58,6 +67,24 @@ fn handle_input(
                         mob_global_transform.translation().truncate(),
                     ));
                 }
+            } else if let Ok((item_entity, item_global_transform, item_transform, item_collider)) = item_query.get_single()
+            {
+                // if item is in pickup range, pick it up
+                // otherwise move towards it
+                if item_collider.distance_to_point(
+                    item_transform.translation.truncate(),
+                    item_transform.rotation,
+                    player_global_transform.translation().truncate(),
+                    true,
+                ) <= player_stats.radius {
+                    item_pick_up_event_writer.send(ItemPickUpEvent {
+                        item: item_entity,
+                    });
+                } else {
+                    player_move_event_writer.send(PlayerMoveEvent(
+                        item_global_transform.translation().truncate(),
+                    ));
+                }
             } else {
                 // no mob targeted, move to cursor
                 player_move_event_writer.send(PlayerMoveEvent(position));
@@ -66,10 +93,10 @@ fn handle_input(
     }
 }
 
-fn target_mob(
+fn target_mob_or_item (
     window_query: Query<&Window>,
     camera_query: Query<(&Camera, &GlobalTransform), With<Camera>>,
-    mob_query: Query<(&Collider, &Transform, Entity), With<Mob>>,
+    mob_or_item_query: Query<(&Collider, &Transform, Entity), Or<(With<Mob>, With<Item>)>>,
     mut commands: Commands,
     mut mouse_button_event_reader: EventReader<MouseButtonInput>,
 ) {
@@ -84,10 +111,10 @@ fn target_mob(
                     .cursor_position()
                     .and_then(|cursor| camera.viewport_to_world_2d(camera_transform, cursor))
                 {
-                    for (collider, mob_transform, entity) in mob_query.iter() {
+                    for (collider, transform, entity) in mob_or_item_query.iter() {
                         if collider.contains_point(
-                            mob_transform.translation.truncate(),
-                            mob_transform.rotation,
+                            transform.translation.truncate(),
+                            transform.rotation,
                             position,
                         ) {
                             commands.entity(entity).insert(Targeted);
@@ -100,9 +127,9 @@ fn target_mob(
     }
 }
 
-fn release_targeted_mob(
+fn release_targeted_mob_or_item (
     mut commands: Commands,
-    targeted_mob_query: Query<Entity, (With<Mob>, With<Targeted>)>,
+    targeted_mob_or_item_query: Query<Entity, (Or<(With<Mob>, With<Item>)>, With<Targeted>)>,
     mut mouse_button_event_reader: EventReader<MouseButtonInput>,
 ) {
     use bevy::input::ButtonState;
@@ -111,8 +138,8 @@ fn release_targeted_mob(
         match event.state {
             ButtonState::Pressed => (),
             ButtonState::Released => {
-                if let Ok(targeted_mob) = targeted_mob_query.get_single() {
-                    commands.entity(targeted_mob).remove::<Targeted>();
+                if let Ok(targeted_mob_or_item) = targeted_mob_or_item_query.get_single() {
+                    commands.entity(targeted_mob_or_item).remove::<Targeted>();
                 }
             }
         }

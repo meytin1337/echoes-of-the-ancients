@@ -11,6 +11,7 @@ pub struct Player;
 
 #[derive(Component)]
 pub struct PlayerStats {
+    pub radius: f32,
     pub health: f32,
     pub attack_damage: f32,
     pub armor: f32,
@@ -52,6 +53,7 @@ fn setup(
         },
         Player,
         PlayerStats {
+            radius,
             health: 100.0,
             attack_damage: 10.0,
             armor: 5.0,

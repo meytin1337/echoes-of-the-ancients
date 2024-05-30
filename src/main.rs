@@ -1,5 +1,5 @@
 use crate::game_state::Location;
-use crate::items::drop::DropPlugin;
+use crate::items::{drop::DropPlugin, pick_up::PickUpPlugin};
 use crate::mobs::goblin::{attack::GoblinAttackPlugin, spawn_goblin::SpawnGoblinPlugin};
 use crate::mobs::{general_mob_behaviour::GeneralMobBehaviourPlugin, spawn_mobs::SpawnMobsPlugin};
 use crate::player::{
@@ -31,6 +31,7 @@ fn main() {
             PlayerAttackPlugin,
             mobs::combat::attack::MobAttackPlugin,
             DropPlugin,
+            PickUpPlugin,
         ))
         .insert_state(Location::Floor1)
         .run();
