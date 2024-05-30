@@ -1,38 +1,31 @@
-use crate::game_state::Location;
-use crate::items::{drop::DropPlugin, pick_up::PickUpPlugin};
-use crate::mobs::goblin::{attack::GoblinAttackPlugin, spawn_goblin::SpawnGoblinPlugin};
-use crate::mobs::{general_mob_behaviour::GeneralMobBehaviourPlugin, spawn_mobs::SpawnMobsPlugin};
-use crate::player::{
-    attack::PlayerAttackPlugin, input_handling::InputHandlingPlugin, movement::PlayerMovementPlugin,
-};
+use crate::states::{GameState, Location};
+use crate::ui::inventory::InventoryPlugin;
 use bevy::prelude::*;
+use bevy_egui::EguiPlugin;
 use bevy_embedded_assets::EmbeddedAssetPlugin;
 use bevy_xpbd_2d::prelude::*;
 
-mod game_state;
+mod input_handling;
+mod items;
 mod mobs;
 mod player;
-mod setup;
-mod items;
+mod states;
+mod ui;
 
 fn main() {
     App::new()
+        .insert_state(Location::Floor1)
+        .insert_state(GameState::Playing)
         .add_plugins((
             DefaultPlugins,
             EmbeddedAssetPlugin::default(),
             PhysicsPlugins::default(),
-            InputHandlingPlugin,
-            PlayerMovementPlugin,
-            setup::SetupPlugin,
-            SpawnGoblinPlugin,
-            SpawnMobsPlugin,
-            GoblinAttackPlugin,
-            GeneralMobBehaviourPlugin,
-            PlayerAttackPlugin,
-            mobs::combat::attack::MobAttackPlugin,
-            DropPlugin,
-            PickUpPlugin,
+            input_handling::InputHandlingPlugin,
+            EguiPlugin,
+            InventoryPlugin,
+            player::PlayerPlugin,
+            items::ItemsPlugin,
+            mobs::MobsPlugin,
         ))
-        .insert_state(Location::Floor1)
         .run();
 }

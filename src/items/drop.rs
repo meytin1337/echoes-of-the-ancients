@@ -47,13 +47,8 @@ pub enum WeaponStats {
 
 pub struct DropPlugin;
 
-impl Plugin for DropPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(Update, drop_item);
-    }
-}
 
-fn drop_item(
+pub fn drop_item(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,

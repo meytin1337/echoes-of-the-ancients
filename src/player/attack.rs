@@ -1,8 +1,8 @@
 use bevy::prelude::*;
 
 use crate::mobs::spawn_mobs::{Mob, DeadMob};
-use crate::player::input_handling::{PlayerAttackEvent, Targeted};
-use crate::setup::PlayerStats;
+use crate::input_handling::{PlayerAttackEvent, Targeted};
+use crate::player::spawn_player::PlayerStats;
 
 #[derive(Event)]
 pub struct MobKillEvent(pub Entity);
@@ -10,16 +10,7 @@ pub struct MobKillEvent(pub Entity);
 #[derive(Event)]
 pub struct ItemDropEvent(pub Entity);
 
-pub struct PlayerAttackPlugin;
-impl Plugin for PlayerAttackPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(Update, (attack, killed_mob_cleanup))
-            .add_event::<MobKillEvent>()
-            .add_event::<ItemDropEvent>();
-    }
-}
-
-fn attack(
+pub fn attack(
     mut player_attack_event_reader: EventReader<PlayerAttackEvent>,
     mut mob_kill_event_writer: EventWriter<MobKillEvent>,
     mut item_drop_event_writer: EventWriter<ItemDropEvent>, 
@@ -48,7 +39,7 @@ fn attack(
     }
 }
 
-fn killed_mob_cleanup(
+pub fn killed_mob_cleanup(
     mut commands: Commands,
     mut mob_query: Query<(Entity, &mut Mob), With<DeadMob>>,
     time: Res<Time>,

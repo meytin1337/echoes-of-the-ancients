@@ -1,23 +1,14 @@
 use bevy::prelude::*;
 
 use crate::mobs::spawn_mobs::Mob;
-use crate::setup::PlayerStats;
+use crate::player::spawn_player::PlayerStats;
 
 #[derive(Event)]
 pub struct MobAttackEvent {
     pub mob_entity: Entity,
 }
 
-pub struct MobAttackPlugin;
-
-impl Plugin for MobAttackPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(Update, (attack_player, tick_mob_attack_timer))
-            .add_event::<MobAttackEvent>();
-    }
-}
-
-fn attack_player(
+pub fn attack_player(
     mut mob_melee_attack_event_reader: EventReader<MobAttackEvent>,
     mut player_query: Query<&mut PlayerStats>,
     mut mob_query: Query<&mut Mob>,
@@ -34,7 +25,7 @@ fn attack_player(
     }
 }
 
-fn tick_mob_attack_timer(mut mob_query: Query<&mut Mob>, time: Res<Time>) {
+pub fn tick_mob_attack_timer(mut mob_query: Query<&mut Mob>, time: Res<Time>) {
     for mut mob in mob_query.iter_mut() {
         mob.attack_timer.tick(time.delta());
     }

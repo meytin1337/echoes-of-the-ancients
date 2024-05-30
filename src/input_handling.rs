@@ -1,10 +1,10 @@
 use bevy::input::mouse::MouseButtonInput;
-use bevy::prelude::*;
+use bevy::{prelude::*, input::keyboard::KeyCode};
 use bevy_xpbd_2d::plugins::collision::Collider;
 use crate::items::drop::Item;
 
 use crate::mobs::spawn_mobs::Mob;
-use crate::setup::PlayerStats;
+use crate::player::spawn_player::PlayerStats;
 #[derive(Event)]
 pub struct PlayerMoveEvent(pub Vec2);
 
@@ -28,6 +28,13 @@ impl Plugin for InputHandlingPlugin {
             .add_event::<PlayerMoveEvent>()
             .add_event::<PlayerAttackEvent>()
             .add_event::<ItemPickUpEvent>();
+    }
+}
+
+fn toggle_inventory(
+    keys: Res<ButtonInput<KeyCode>>,
+) {
+    if keys.just_pressed(KeyCode::KeyI) {
     }
 }
 fn handle_input(

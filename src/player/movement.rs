@@ -1,23 +1,13 @@
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::LinearVelocity;
 
-use crate::player::input_handling::PlayerMoveEvent;
-use crate::setup::{Camera, Player};
+use crate::input_handling::PlayerMoveEvent;
+use crate::player::spawn_player::{Camera, Player};
 
 #[derive(Event)]
 pub struct CameraMoveEvent(pub Vec3);
 
-
-pub struct PlayerMovementPlugin;
-impl Plugin for PlayerMovementPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(Update, (run, apply_movement_damping, center_camera))
-            .add_event::<PlayerMoveEvent>()
-            .add_event::<CameraMoveEvent>();
-    }
-}
-
-fn run(
+pub fn run(
     mut player_move_event_reader: EventReader<PlayerMoveEvent>,
     mut player_query: Query<(&GlobalTransform, &Transform, &mut LinearVelocity), With<Player>>,
     time: Res<Time>,
@@ -36,13 +26,13 @@ fn run(
     }
 }
 
-fn apply_movement_damping(mut linear_velocity_query: Query<&mut LinearVelocity, With<Player>>) {
+pub fn apply_movement_damping(mut linear_velocity_query: Query<&mut LinearVelocity, With<Player>>) {
     let mut linear_velocity = linear_velocity_query.single_mut();
     linear_velocity.x *= 0.5;
     linear_velocity.y *= 0.5;
 }
 
-fn center_camera(
+pub fn center_camera(
     mut camera_transform_query: Query<&mut Transform, With<Camera>>,
     mut camera_move_event_reader: EventReader<CameraMoveEvent>,
 ) {

@@ -6,8 +6,6 @@ use bevy::{
 };
 use crate::mobs::spawn_mobs::{Mob, SpawnGoblinEvent, MobType};
 
-pub struct SpawnGoblinPlugin;
-
 #[derive(Component)]
 pub struct Goblin;
 
@@ -20,14 +18,8 @@ pub struct GoblinBundle {
     pub material_mesh_2d_bundle: MaterialMesh2dBundle<ColorMaterial>,
     pub mob: Mob,
 }
-impl Plugin for SpawnGoblinPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(Update, spawn);
-    }
-}
 
-
-fn spawn(
+pub fn spawn_goblin(
     mut commands: Commands,
     mut meshes: ResMut<Assets<Mesh>>,
     mut materials: ResMut<Assets<ColorMaterial>>,

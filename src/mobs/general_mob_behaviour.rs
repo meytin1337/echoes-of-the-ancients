@@ -1,7 +1,7 @@
-use crate::mobs::goblin::attack::GoblinAttackEvent;
-use crate::mobs::combat::attack::MobAttackEvent;
+use crate::mobs::goblin::goblin_attack::GoblinAttackEvent;
+use crate::mobs::combat::mob_attack::MobAttackEvent;
 use crate::mobs::spawn_mobs::{Mob, MobType, DeadMob};
-use crate::setup::Player;
+use crate::player::spawn_player::Player;
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::*;
 
@@ -11,16 +11,7 @@ pub struct MobMoveEvent {
     pub target_position: Vec2,
 }
 
-pub struct GeneralMobBehaviourPlugin;
-
-impl Plugin for GeneralMobBehaviourPlugin {
-    fn build(&self, app: &mut App) {
-        app.add_systems(Update, (attack_player, mob_run_to_player, apply_mob_movement_damping))
-            .add_event::<MobMoveEvent>();
-    }
-}
-
-fn attack_player(
+pub fn target_player(
     player_query: Query<&GlobalTransform, With<Player>>,
     mob_query: Query<(Entity, &Transform, &Collider, &Mob), Without<DeadMob>>,
     mut goblin_attack_event_writer: EventWriter<GoblinAttackEvent>,
@@ -55,7 +46,7 @@ fn attack_player(
     }
 }
 
-fn mob_run_to_player(
+pub fn run_to_player(
     mut mob_move_event_reader: EventReader<MobMoveEvent>,
     mut mob_query: Query<(&GlobalTransform, &mut LinearVelocity, &Mob), Without<DeadMob>>,
     time: Res<Time>,
@@ -77,7 +68,7 @@ fn mob_run_to_player(
     }
 }
 
-fn apply_mob_movement_damping(mut linear_velocity_query: Query<&mut LinearVelocity, With<Mob>>) {
+pub fn apply_mob_movement_damping(mut linear_velocity_query: Query<&mut LinearVelocity, With<Mob>>) {
     for mut linear_velocity in &mut linear_velocity_query {
         linear_velocity.x *= 0.5;
         linear_velocity.y *= 0.5;
