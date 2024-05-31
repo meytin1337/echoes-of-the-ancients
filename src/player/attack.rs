@@ -1,4 +1,6 @@
 use bevy::prelude::*;
+use bevy_xpbd_2d::plugins::collision::Collider;
+use bevy_xpbd_2d::components::RigidBody;
 
 use crate::mobs::spawn_mobs::{Mob, DeadMob};
 use crate::input_handling::{PlayerAttackEvent, Targeted};
@@ -24,13 +26,14 @@ pub fn attack(
     for event in player_attack_event_reader.read() {
         if let Ok(mut mob_stats) = mob_query.get_mut(event.target) {
             if player_stats.attack_timer.elapsed_secs() > player_stats.attack_speed {
+                // add items to calculation
                 mob_stats.health -= player_stats.attack_damage - mob_stats.armor;
-                println!("Mob health: {}", mob_stats.health);
                 if mob_stats.health <= 0.0 {
-                    // command.entity(event.target).despawn();
                     item_drop_event_writer.send(ItemDropEvent(event.target));
                     mob_kill_event_writer.send(MobKillEvent(event.target));
                     commands.entity(event.target).remove::<Targeted>();
+                    commands.entity(event.target).remove::<RigidBody>();
+                    commands.entity(event.target).remove::<Collider>();
                     commands.entity(event.target).insert(DeadMob);
                 }
                 player_stats.attack_timer.reset();
