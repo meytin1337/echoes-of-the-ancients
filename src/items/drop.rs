@@ -19,27 +19,24 @@ pub struct ItemBundle {
 pub struct Item {
     pub item_stats: ItemStats,
     pub name: String,
+    pub item_type: ItemType,
 }
 
-pub enum ItemStats {
-    Armor(ArmorStats),
-    Weapon(WeaponStats),
+#[derive(PartialEq)]
+pub enum ItemType {
+    Armor,
+    Weapon,
 }
 
-pub struct ArmorStats {
+pub struct ItemStats {
     pub health: Option<f32>,
     pub armor: Option<f32>,
     pub movement_speed: Option<f32>,
-}
-
-pub struct WeaponStats {
     pub fire_damage: Option<f32>,
     pub ice_damage: Option<f32>,
     pub poison_damage: Option<f32>,
     pub attack_speed: Option<f32>,
 }
-
-pub struct DropPlugin;
 
 pub fn drop_item(
     mut commands: Commands,
@@ -60,12 +57,18 @@ pub fn drop_item(
                     commands.spawn(ItemBundle {
                         collider: Collider::rectangle(20.0, 20.0),
                         item: Item {
-                            item_stats: ItemStats::Armor(ArmorStats {
+                            item_type: ItemType::Armor,
+                            item_stats: ItemStats {
                                 health: Some(10.0),
                                 armor: Some(10.0),
                                 movement_speed: Some(1.0),
-                            }),
+                                fire_damage: None,
+                                ice_damage: None,
+                                poison_damage: None,
+                                attack_speed: None,
+                            },
                             name: String::from("test"),
+
                         },
                         material_mesh_2d_bundle: MaterialMesh2dBundle {
                             mesh: Mesh2dHandle(meshes.add(Rectangle {
@@ -83,12 +86,16 @@ pub fn drop_item(
                     commands.spawn(ItemBundle {
                         collider: Collider::rectangle(20.0, 20.0),
                         item: Item {
-                            item_stats: ItemStats::Weapon(WeaponStats {
+                            item_stats: ItemStats {
+                                health: None,
+                                armor: None,
+                                movement_speed: None,
                                 fire_damage: Some(10.0),
                                 ice_damage: Some(10.0),
                                 poison_damage: Some(10.0),
                                 attack_speed: Some(1.0),
-                            }),
+                            },
+                            item_type: ItemType::Weapon,
                             name: String::from("test_weapon"),
                         },
                         material_mesh_2d_bundle: MaterialMesh2dBundle {

@@ -1,7 +1,7 @@
 use crate::items::drop::Item;
+use crate::items::pick_up::InventoryItem;
 use bevy::prelude::*;
 use bevy_egui::{egui, EguiContexts};
-use crate::items::pick_up::InventoryItem;
 
 #[derive(Resource)]
 pub struct InventoryState {
@@ -22,7 +22,8 @@ impl Default for InventoryState {
 pub fn show_inventory(
     mut inventory_state: ResMut<InventoryState>,
     mut egui_contexts: EguiContexts,
-    item_query: Query<(Entity, &Item), With<InventoryItem>>,
+    item_query: Query<(Entity, &Item), (With<InventoryItem>, Without<EquippedItem>)>,
+    equipped_item_query: Query<(Entity, &Item), With<EquippedItem>>,
     mut commands: Commands,
 ) {
     if inventory_state.is_window_open {
@@ -36,9 +37,22 @@ pub fn show_inventory(
                     }
                     if ui.button("Equip").clicked() {
                         commands.entity(entity).insert(EquippedItem);
+                        for (equipped_entity, equipped_item) in equipped_item_query.iter() {
+                            // if another item of the same type is equipped, remove it
+                            println!("equipped item: {}", item.name);
+                            if entity != equipped_entity && item.item_type == equipped_item.item_type {
+                                println!("unequipped item: {}", equipped_item.name);
+                                commands.entity(equipped_entity).remove::<EquippedItem>();
+                            }
+                        }
                     }
                 }
-                ui.label("This is the inventory window");
+                for (entity, item) in equipped_item_query.iter() {
+                    ui.label(String::from("equipped item:") + &item.name);
+                    if ui.button("Unequip").clicked() {
+                        commands.entity(entity).remove::<EquippedItem>();
+                    }
+                }
             });
     }
 }
