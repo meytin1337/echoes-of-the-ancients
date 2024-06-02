@@ -39,9 +39,9 @@ pub fn show_inventory(
                         if let Some(item_stats) = &item.item_stats {
                             for stat in item_stats {
                                 ui.label(format!(
-                                    "{}",
-                                    // stat.attribute_type.to_string(),
-                                    stat.value
+                                    "{}: {}",
+                                    stat.attribute_type.to_string(),
+                                    stat.value,
                                 ));
                             }
                         }
