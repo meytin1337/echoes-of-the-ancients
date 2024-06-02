@@ -39,7 +39,7 @@ impl Plugin for PlayerPlugin {
             )
             .insert_resource(PlayerStats {
                 health: 100.0,
-                attack_damage: 10.0,
+                attack_damage: 30.0,
                 armor: 0.0,
                 attack_range: 50.0,
                 attack_speed: 1.0,

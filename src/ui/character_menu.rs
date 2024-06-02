@@ -1,16 +1,7 @@
-use crate::items::drop::{Item, ItemType};
 use crate::items::pick_up::InventoryItem;
+use crate::player::PlayerStats;
 use bevy::prelude::*;
 use bevy_egui::{egui, EguiContexts};
-
-#[derive(Resource)]
-pub struct Inventory {
-    pub is_window_open: bool,
-    pub gold: u32,
-}
-
-#[derive(Component)]
-pub struct EquippedItem;
 
 impl Default for Inventory {
     fn default() -> Self {
