@@ -66,12 +66,13 @@ impl fmt::Display for WeaponType {
 pub enum Attributes {
     Health,
     Armor,
+    Mana,
     MovementSpeed,
     FireDamage,
-    IceDamage,
+    ColdDamage,
     PoisonDamage,
     AttackSpeed,
-    AttackDamage,
+    PhysicalDamage,
 }
 
 impl fmt::Display for Attributes {
@@ -79,10 +80,10 @@ impl fmt::Display for Attributes {
         match self {
             Attributes::MovementSpeed => write!(f, "Movement Speed"),
             Attributes::FireDamage => write!(f, "Fire Damage"),
-            Attributes::IceDamage => write!(f, "Ice Damage"),
+            Attributes::ColdDamage => write!(f, "Cold Damage"),
             Attributes::PoisonDamage => write!(f, "Poison Damage"),
             Attributes::AttackSpeed => write!(f, "Attack Speed"),
-            Attributes::AttackDamage => write!(f, "Attack Damage"),
+            Attributes::PhysicalDamage => write!(f, "Physical Damage"),
             _ => write!(f, "{:?}", self),
         }
     }
@@ -99,7 +100,12 @@ pub struct AttributeRange {
     max: u32,
 }
 
-const ARMOR_ATTRIBUTES: [AttributeRange; 3] = [
+const ARMOR_ATTRIBUTES: [AttributeRange; 4] = [
+    AttributeRange {
+        attribute_type: Attributes::Mana,
+        min: 10,
+        max: 100,
+    },
     AttributeRange {
         attribute_type: Attributes::Health,
         min: 10,
@@ -123,7 +129,7 @@ const WEAPON_ATTRIBUTES: [AttributeRange; 5] = [
         max: 100,
     },
     AttributeRange {
-        attribute_type: Attributes::IceDamage,
+        attribute_type: Attributes::ColdDamage,
         min: 10,
         max: 100,
     },
@@ -138,7 +144,7 @@ const WEAPON_ATTRIBUTES: [AttributeRange; 5] = [
         max: 10,
     },
     AttributeRange {
-        attribute_type: Attributes::AttackDamage,
+        attribute_type: Attributes::PhysicalDamage,
         min: 10,
         max: 100,
     },

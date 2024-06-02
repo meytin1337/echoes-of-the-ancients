@@ -26,7 +26,7 @@ pub struct Targeted;
 pub struct InputHandlingPlugin;
 impl Plugin for InputHandlingPlugin {
     fn build(&self, app: &mut App) {
-        app.add_systems(Update, (target_mob_or_item, release_targeted_mob_or_item, handle_mouse_click, toggle_inventory))
+        app.add_systems(Update, (target_mob_or_item, release_targeted_mob_or_item, handle_mouse_click, toggle_inventory, toggle_character_menu))
             .add_event::<PlayerMoveEvent>()
             .add_event::<PlayerAttackEvent>()
             .add_event::<ItemPickUpEvent>();
@@ -46,7 +46,31 @@ fn toggle_inventory(
             GameState::Inventory => {
                 next_state.set(GameState::Playing);
             }
-            GameState::Paused => (),
+            GameState::CharacterMenu => {
+                next_state.set(GameState::Inventory);
+            }
+            _ => (),
+        }
+    }
+}
+
+fn toggle_character_menu(
+    keys: Res<ButtonInput<KeyCode>>,
+    app_state: ResMut<State<GameState>>,
+    mut next_state: ResMut<NextState<GameState>>,
+) {
+    if keys.just_pressed(KeyCode::KeyA) {
+        match app_state.get() {
+            GameState::Playing => {
+                next_state.set(GameState::CharacterMenu);
+            }
+            GameState::CharacterMenu => {
+                next_state.set(GameState::Playing);
+            }
+            GameState::Inventory => {
+                next_state.set(GameState::CharacterMenu);
+            }
+            _ => (),
         }
     }
 }

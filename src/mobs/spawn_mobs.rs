@@ -4,14 +4,14 @@ use bevy::time::Stopwatch;
 
 #[derive(Component)]
 pub struct Mob {
-    pub health: f32,
-    pub movement_speed: f32,
+    pub health: u32,
+    pub movement_speed: u32,
     pub view_range: f32,
     pub attack_range: f32,
-    pub attack_damage: f32,
+    pub attack_damage: u32,
     pub attack_speed: f32,
     pub attack_timer: Stopwatch,
-    pub armor: f32,
+    pub armor: u32,
     pub mob_type: MobType,
     pub move_speed: f32,
     pub death_timer: Stopwatch,

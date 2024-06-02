@@ -28,7 +28,8 @@ pub fn attack(
             if player_stats.attack_timer.elapsed_secs() > player_stats.attack_speed {
                 // add items to calculation
                 mob_stats.health -= player_stats.attack_damage - mob_stats.armor;
-                if mob_stats.health <= 0.0 {
+                println!("Mob health: {}", mob_stats.health);
+                if mob_stats.health <= 0 {
                     item_drop_event_writer.send(ItemDropEvent(event.target));
                     mob_kill_event_writer.send(MobKillEvent(event.target));
                     commands.entity(event.target).remove::<Targeted>();

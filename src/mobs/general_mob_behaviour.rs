@@ -61,9 +61,9 @@ pub fn run_to_player(
             );
             let normalized_direction = direction.normalize();
             linear_velocity.x =
-                normalized_direction.x * mob_stats.move_speed * time.delta_seconds();
+                normalized_direction.x * mob_stats.move_speed * 100.0 * time.delta_seconds();
             linear_velocity.y =
-                normalized_direction.y * mob_stats.move_speed * time.delta_seconds();
+                normalized_direction.y * mob_stats.move_speed * 100.0 * time.delta_seconds();
         }
     }
 }

@@ -1,4 +1,5 @@
 use bevy::prelude::*;
+use crate::player::PlayerStats;
 use bevy_xpbd_2d::prelude::LinearVelocity;
 
 use crate::input_handling::PlayerMoveEvent;
@@ -10,6 +11,7 @@ pub struct CameraMoveEvent(pub Vec3);
 pub fn run(
     mut player_move_event_reader: EventReader<PlayerMoveEvent>,
     mut player_query: Query<(&GlobalTransform, &Transform, &mut LinearVelocity), With<Player>>,
+    player_stats_res: Res<PlayerStats>,
     time: Res<Time>,
     mut camera_move_event_writer: EventWriter<CameraMoveEvent>,
 ) {
@@ -20,8 +22,8 @@ pub fn run(
             event.0.y - global_transform.translation().y,
         );
         let normalized_direction = direction.normalize();
-        linear_velocity.x = normalized_direction.x * 10000.0 * time.delta_seconds();
-        linear_velocity.y = normalized_direction.y * 10000.0 * time.delta_seconds();
+        linear_velocity.x = normalized_direction.x * player_stats_res.move_speed * 100.0 * time.delta_seconds();
+        linear_velocity.y = normalized_direction.y * player_stats_res.move_speed * 100.0 * time.delta_seconds();
         camera_move_event_writer.send(CameraMoveEvent(transform.translation));
     }
 }

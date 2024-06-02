@@ -13,6 +13,7 @@ pub enum GameState {
     Playing,
     Paused,
     Inventory,
+    CharacterMenu,
 }
 
 impl Plugin for StatesPlugin {
@@ -20,7 +21,9 @@ impl Plugin for StatesPlugin {
         app.insert_state(Location::Floor1)
             .insert_state(GameState::Playing)
             .add_systems(OnEnter(GameState::Inventory), pause)
-            .add_systems(OnExit(GameState::Inventory), unpause);
+            .add_systems(OnExit(GameState::Inventory), unpause)
+            .add_systems(OnEnter(GameState::CharacterMenu), pause)
+            .add_systems(OnExit(GameState::CharacterMenu), unpause);
     }
 }
 

@@ -1,99 +1,73 @@
-use crate::items::pick_up::InventoryItem;
 use crate::player::PlayerStats;
+use crate::items::drop::Attributes;
+use crate::ui::inventory::EquippedItem;
+use crate::items::drop::Item;
 use bevy::prelude::*;
 use bevy_egui::{egui, EguiContexts};
 
-impl Default for Inventory {
-    fn default() -> Self {
-        Self {
-            is_window_open: false,
-            gold: 0,
-        }
-    }
+#[derive(Resource)]
+pub struct CharacterMenu {
+    pub is_window_open: bool,
 }
 
-pub fn show_inventory(
-    inventory_state: ResMut<Inventory>,
+pub fn show_character_menu(
     mut egui_contexts: EguiContexts,
-    item_query: Query<(Entity, &Item), (With<InventoryItem>, Without<EquippedItem>)>,
-    equipped_item_query: Query<(Entity, &Item), With<EquippedItem>>,
-    mut commands: Commands,
+    equipped_item_query: Query<&Item, With<EquippedItem>>,
+    player_stats_res: Res<PlayerStats>,
+    character_menu_state: Res<CharacterMenu>,
 ) {
-    if inventory_state.is_window_open {
-        let mut health_potion_counter = 0;
-        let mut mana_potion_counter = 0;
-        egui::SidePanel::left("Inventory").show(egui_contexts.ctx_mut(), |ui| {
-            ui.label("Equipped Items:");
-            for (entity, item) in equipped_item_query.iter() {
-                ui.horizontal(|ui| {
-                    ui.label(&item.name).on_hover_ui(|ui| {
-                        if let Some(item_stats) = &item.item_stats {
-                            for stat in item_stats {
-                                ui.label(format!(
-                                    "{}",
-                                    // stat.attribute_type.to_string(),
-                                    stat.value
-                                ));
+    if character_menu_state.is_window_open {
+        let mut total_damage = player_stats_res.attack_damage;
+        let mut total_armor = player_stats_res.armor;
+        let mut total_health = player_stats_res.health;
+        let mut total_mana = player_stats_res.mana;
+        egui::SidePanel::left("CharacterMenu").show(egui_contexts.ctx_mut(), |ui| {
+            ui.label("Stats:");
+            for item in equipped_item_query.iter() {
+                match &item.item_stats {
+                    Some(item_stats) => {
+                        for stat in item_stats {
+                            match stat.attribute_type {
+                                Attributes::PhysicalDamage => {
+                                    total_damage += stat.value;
+                                }
+                                Attributes::Armor => {
+                                    total_armor += stat.value;
+                                }
+                                Attributes::Health => {
+                                    total_health += stat.value;
+                                }
+                                Attributes::Mana => {
+                                    total_mana += stat.value;
+                                }
+                                Attributes::FireDamage => {
+                                    total_damage += stat.value;
+                                }
+                                Attributes::ColdDamage => {
+                                    total_damage += stat.value;
+                                }
+                                Attributes::PoisonDamage => {
+                                    total_damage += stat.value;
+                                }
+                                _ => {}
                             }
                         }
-                    });
-                    if ui.button("Unequip").clicked() {
-                        commands.entity(entity).remove::<EquippedItem>();
                     }
-                });
-            }
-            ui.label("Inventory:");
-            for (entity, item) in item_query.iter() {
-                match item.item_type {
-                    ItemType::HealthPotion => {
-                        health_potion_counter += 1;
-                    }
-                    ItemType::ManaPotion => {
-                        mana_potion_counter += 1;
-                    }
-                    ItemType::Gold(_) => (),
-                    _ => {
-                        ui.horizontal(|ui| {
-                            ui.label(&item.name).on_hover_ui(|ui| {
-                                if let Some(item_stats) = &item.item_stats {
-                                    for stat in item_stats {
-                                        ui.label(format!(
-                                            "{}: {}",
-                                            stat.attribute_type.to_string(),
-                                            stat.value
-                                        ));
-                                    }
-                                }
-                            });
-                            if ui.button("Drop").clicked() {
-                                commands.entity(entity).remove::<InventoryItem>();
-                            }
-                            if ui.button("Equip").clicked() {
-                                commands.entity(entity).insert(EquippedItem);
-                                for (equipped_entity, equipped_item) in equipped_item_query.iter() {
-                                    // if another item of the same type is equipped, remove it
-                                    if entity != equipped_entity
-                                        && item.item_type == equipped_item.item_type
-                                    {
-                                        commands.entity(equipped_entity).remove::<EquippedItem>();
-                                    }
-                                }
-                            }
-                        });
-                    }
+                    None => {}
                 }
             }
-            ui.label(format!("Health Potions: {}", health_potion_counter));
-            ui.label(format!("Mana Potions: {}", mana_potion_counter));
-            ui.label(format!("Gold: {}", inventory_state.gold));
+            ui.label(format!("Damage: {}", total_damage));
+            ui.label(format!("Armor: {}", total_armor));
+            ui.label(format!("Health: {}", total_health));
+            ui.label(format!("Mana: {}", total_mana));
         });
     }
 }
 
-pub fn enable_inventory(mut inventory_state: ResMut<Inventory>) {
-    inventory_state.is_window_open = true;
+pub fn enable_character_menu(mut character_menu_state: ResMut<CharacterMenu>) {
+    character_menu_state.is_window_open = true;
 }
 
-pub fn disable_inventory(mut inventory_state: ResMut<Inventory>) {
-    inventory_state.is_window_open = false;
+pub fn disable_character_menu(mut character_menu_state: ResMut<CharacterMenu>) {
+    character_menu_state.is_window_open = false;
 }
