@@ -16,6 +16,8 @@ pub struct Mob {
     pub move_speed: f32,
     pub death_timer: Stopwatch,
     pub item_drop_chance: f32,
+    pub attack_animation_playing: bool,
+    pub run_animation_playing: bool,
 }
 
 #[derive(Component)]
@@ -35,7 +37,7 @@ pub fn floor_1_spawner(mut spawn_goblin_event_writer: EventWriter<SpawnGoblinEve
     // safe amount of spawned mobs in some struct
     // goblin positions should be random
     // eventually the mobs spawned should be randomly selected between different types of mobs 
-    for i in -3..3 {
+    for i in -1..1 {
         spawn_goblin_event_writer.send(SpawnGoblinEvent(Vec3::new(i as f32 * 100.0, i as f32 * 100.0, 0.0)));
     }
 }

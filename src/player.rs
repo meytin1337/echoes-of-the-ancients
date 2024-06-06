@@ -48,7 +48,7 @@ impl Plugin for PlayerPlugin {
                 attack_speed: 1.0,
                 attack_timer: Stopwatch::new(),
                 radius: 10.0,
-                move_speed: 100.0,
+                move_speed: 200.0,
             })
             .add_event::<CameraMoveEvent>()
             .add_event::<MobKillEvent>()
