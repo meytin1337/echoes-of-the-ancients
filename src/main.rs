@@ -18,6 +18,7 @@ fn main() {
             DefaultPlugins,
             EmbeddedAssetPlugin::default(),
             PhysicsPlugins::default(),
+            bevy_framepace::FramepacePlugin,
             input_handling::InputHandlingPlugin,
             EguiPlugin,
             ui::UiPlugin,

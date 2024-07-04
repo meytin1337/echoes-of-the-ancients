@@ -9,6 +9,7 @@ bevy_xpbd_2d = "0.4"
 bevy_embedded_assets = "0.10.2"
 rand = "0.8"
 bevy_egui = "0.27"
+bevy_framepace = "0.16"
 
 [profile.dev]
 opt-level = 1
