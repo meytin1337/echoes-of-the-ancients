@@ -1,6 +1,7 @@
 use crate::items::drop::{Item, ItemType};
-use crate::items::pick_up::InventoryItem;
 use crate::items::equip::EquipItemEvent;
+use crate::items::pick_up::InventoryItem;
+use crate::items::unequip::UnequipItemEvent;
 use bevy::prelude::*;
 use bevy_egui::{egui, EguiContexts};
 
@@ -28,6 +29,7 @@ pub fn show_inventory(
     item_query: Query<(Entity, &Item), (With<InventoryItem>, Without<EquippedItem>)>,
     equipped_item_query: Query<(Entity, &Item), With<EquippedItem>>,
     mut equip_item_event: EventWriter<EquipItemEvent>,
+    mut unequip_item_event: EventWriter<UnequipItemEvent>,
     mut commands: Commands,
 ) {
     if inventory_state.is_window_open {
@@ -50,6 +52,7 @@ pub fn show_inventory(
                     });
                     if ui.button("Unequip").clicked() {
                         commands.entity(entity).remove::<EquippedItem>();
+                        unequip_item_event.send(UnequipItemEvent {});
                     }
                 });
             }
