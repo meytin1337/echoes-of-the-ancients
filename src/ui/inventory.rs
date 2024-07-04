@@ -1,5 +1,6 @@
 use crate::items::drop::{Item, ItemType};
 use crate::items::pick_up::InventoryItem;
+use crate::items::equip::EquipItemEvent;
 use bevy::prelude::*;
 use bevy_egui::{egui, EguiContexts};
 
@@ -26,6 +27,7 @@ pub fn show_inventory(
     mut egui_contexts: EguiContexts,
     item_query: Query<(Entity, &Item), (With<InventoryItem>, Without<EquippedItem>)>,
     equipped_item_query: Query<(Entity, &Item), With<EquippedItem>>,
+    mut equip_item_event: EventWriter<EquipItemEvent>,
     mut commands: Commands,
 ) {
     if inventory_state.is_window_open {
@@ -79,6 +81,8 @@ pub fn show_inventory(
                             }
                             if ui.button("Equip").clicked() {
                                 commands.entity(entity).insert(EquippedItem);
+                                equip_item_event.send(EquipItemEvent);
+                                println!("Equipped item");
                                 for (equipped_entity, equipped_item) in equipped_item_query.iter() {
                                     // if another item of the same type is equipped, remove it
                                     if entity != equipped_entity

@@ -3,6 +3,7 @@ use crate::player::{
     movement::{apply_movement_damping, center_camera, run, CameraMoveEvent},
     spawn_player::spawn_player,
 };
+use crate::items::drop::Item;
 use bevy::{prelude::*, time::Stopwatch};
 pub mod attack;
 pub mod movement;
@@ -11,6 +12,8 @@ pub mod spawn_player;
 #[derive(SystemSet, Debug, Clone, PartialEq, Eq, Hash)]
 pub struct PlayerSet;
 
+
+// maybe switch this to a component instead? -> https://bevy-cheatbook.github.io/programming/res.html
 #[derive(Resource)]
 pub struct PlayerStats {
     pub radius: f32,
@@ -22,6 +25,7 @@ pub struct PlayerStats {
     pub attack_speed: f32,
     pub attack_timer: Stopwatch,
     pub move_speed: f32,
+    pub equipped_items: Vec<Item>,
 }
 
 pub struct PlayerPlugin;
@@ -49,6 +53,7 @@ impl Plugin for PlayerPlugin {
                 attack_timer: Stopwatch::new(),
                 radius: 10.0,
                 move_speed: 200.0,
+                equipped_items: vec![],
             })
             .add_event::<CameraMoveEvent>()
             .add_event::<MobKillEvent>()

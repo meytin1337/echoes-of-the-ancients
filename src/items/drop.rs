@@ -16,14 +16,14 @@ pub struct ItemBundle {
     pub material_mesh_2d_bundle: MaterialMesh2dBundle<ColorMaterial>,
 }
 
-#[derive(Component)]
+#[derive(Component, Clone, Debug, PartialEq)]
 pub struct Item {
     pub name: String,
     pub item_type: ItemType,
     pub item_stats: Option<Vec<Stat>>,
 }
 
-#[derive(PartialEq, Clone, Copy)]
+#[derive(PartialEq, Clone, Copy, Component, Debug)]
 pub enum ItemType {
     Armor(ArmorType),
     Weapon(WeaponType),
@@ -89,6 +89,7 @@ impl fmt::Display for Attributes {
     }
 }
 
+#[derive(Clone, Debug, PartialEq)]
 pub struct Stat {
     pub attribute_type: Attributes,
     pub value: u32,
