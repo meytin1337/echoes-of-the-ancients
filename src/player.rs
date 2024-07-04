@@ -1,6 +1,6 @@
 use crate::player::{
     attack::{attack, killed_mob_cleanup, ItemDropEvent, MobKillEvent},
-    movement::{apply_movement_damping, center_camera, run, CameraMoveEvent},
+    movement::{center_camera, run, CameraMoveEvent},
     spawn_player::spawn_player,
 };
 use crate::items::drop::Item;
@@ -38,7 +38,6 @@ impl Plugin for PlayerPlugin {
                     attack,
                     killed_mob_cleanup,
                     run,
-                    apply_movement_damping,
                     center_camera,
                 )
                     .in_set(crate::sets::PlayingSet),
