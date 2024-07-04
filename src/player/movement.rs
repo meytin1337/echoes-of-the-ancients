@@ -1,4 +1,4 @@
-use crate::player::spawn_player::{AnimationIndices, AnimationTimer};
+use crate::player::spawn_player::PlayerAssets;
 use crate::player::PlayerStats;
 use bevy::prelude::*;
 use bevy_xpbd_2d::prelude::LinearVelocity;
@@ -11,14 +11,23 @@ pub struct CameraMoveEvent(pub Vec3);
 
 pub fn run(
     mut player_move_event_reader: EventReader<PlayerMoveEvent>,
-    mut player_query: Query<(&GlobalTransform, &mut Transform, &mut LinearVelocity), With<Player>>,
+    mut player_query: Query<
+        (
+            &GlobalTransform,
+            &mut Transform,
+            &mut LinearVelocity,
+            &mut TextureAtlas,
+        ),
+        With<Player>,
+    >,
     player_stats_res: Res<PlayerStats>,
     time: Res<Time>,
     mut camera_move_event_writer: EventWriter<CameraMoveEvent>,
-    mut animation_query: Query<(&AnimationIndices, &mut AnimationTimer, &mut TextureAtlas)>,
+    mut player_assets: ResMut<PlayerAssets>,
 ) {
     for event in player_move_event_reader.read() {
-        let (global_transform, transform, mut linear_velocity) = player_query.single_mut();
+        let (global_transform, transform, mut linear_velocity, mut atlas) =
+            player_query.single_mut();
         let direction = Vec2::new(
             event.0.x - global_transform.translation().x,
             event.0.y - global_transform.translation().y,
@@ -28,58 +37,60 @@ pub fn run(
             normalized_direction.x * player_stats_res.move_speed * 100.0 * time.delta_seconds();
         linear_velocity.y =
             normalized_direction.y * player_stats_res.move_speed * 100.0 * time.delta_seconds();
-        for (indices, mut timer, mut atlas) in &mut animation_query {
-            timer.tick(time.delta());
-            if timer.just_finished() {
-                if normalized_direction.x > 0.0
-                    && normalized_direction.x.abs() > normalized_direction.y.abs()
-                {
-                    atlas.index = if atlas.index == indices.run_right_last {
-                        indices.run_right_first
-                    } else if atlas.index > indices.run_right_last
-                        || atlas.index < indices.run_right_first
+        player_assets.walk_animation_timer.tick(time.delta());
+        if player_assets.walk_animation_timer.just_finished() {
+            if normalized_direction.x > 0.0
+                && normalized_direction.x.abs() > normalized_direction.y.abs()
+            {
+                atlas.index =
+                    if atlas.index == player_assets.general_animation_indices.run_right_last {
+                        player_assets.general_animation_indices.run_right_first
+                    } else if atlas.index > player_assets.general_animation_indices.run_right_last
+                        || atlas.index < player_assets.general_animation_indices.run_right_first
                     {
-                        indices.run_right_first
+                        player_assets.general_animation_indices.run_right_first
                     } else {
                         atlas.index + 1
                     };
-                } else if normalized_direction.x < 0.0
-                    && normalized_direction.x.abs() > normalized_direction.y.abs()
-                {
-                    atlas.index = if atlas.index == indices.run_left_last {
-                        indices.run_left_first
-                    } else if atlas.index > indices.run_left_last
-                        || atlas.index < indices.run_left_first
+            } else if normalized_direction.x < 0.0
+                && normalized_direction.x.abs() > normalized_direction.y.abs()
+            {
+                atlas.index =
+                    if atlas.index == player_assets.general_animation_indices.run_left_last {
+                        player_assets.general_animation_indices.run_left_first
+                    } else if atlas.index > player_assets.general_animation_indices.run_left_last
+                        || atlas.index < player_assets.general_animation_indices.run_left_first
                     {
-                        indices.run_left_first
+                        player_assets.general_animation_indices.run_left_first
                     } else {
                         atlas.index + 1
                     };
-                } else if normalized_direction.y > 0.0
-                    && normalized_direction.y.abs() > normalized_direction.x.abs()
+            } else if normalized_direction.y > 0.0
+                && normalized_direction.y.abs() > normalized_direction.x.abs()
+            {
+                atlas.index = if atlas.index == player_assets.general_animation_indices.run_up_last
                 {
-                    atlas.index = if atlas.index == indices.run_up_last {
-                        indices.run_up_first
-                    } else if atlas.index > indices.run_up_last
-                        || atlas.index < indices.run_up_first
-                    {
-                        indices.run_up_first
-                    } else {
-                        atlas.index + 1
-                    };
-                } else if normalized_direction.y < 0.0
-                    && normalized_direction.y.abs() > normalized_direction.x.abs()
+                    player_assets.general_animation_indices.run_up_first
+                } else if atlas.index > player_assets.general_animation_indices.run_up_last
+                    || atlas.index < player_assets.general_animation_indices.run_up_first
                 {
-                    atlas.index = if atlas.index == indices.run_down_last {
-                        indices.run_down_first
-                    } else if atlas.index > indices.run_down_last
-                        || atlas.index < indices.run_down_first
+                    player_assets.general_animation_indices.run_up_first
+                } else {
+                    atlas.index + 1
+                };
+            } else if normalized_direction.y < 0.0
+                && normalized_direction.y.abs() > normalized_direction.x.abs()
+            {
+                atlas.index =
+                    if atlas.index == player_assets.general_animation_indices.run_down_last {
+                        player_assets.general_animation_indices.run_down_first
+                    } else if atlas.index > player_assets.general_animation_indices.run_down_last
+                        || atlas.index < player_assets.general_animation_indices.run_down_first
                     {
-                        indices.run_down_first
+                        player_assets.general_animation_indices.run_down_first
                     } else {
                         atlas.index + 1
                     }
-                }
             }
         }
 
