@@ -228,7 +228,7 @@ pub fn roll_item_type() -> ItemType {
         (ItemType::Armor(ArmorType::Gloves), 0.038),
         (ItemType::Weapon(WeaponType::Bow), 0.05),
         (ItemType::Weapon(WeaponType::Staff), 0.05),
-        (ItemType::Weapon(WeaponType::Sword), 0.05),
+        (ItemType::Weapon(WeaponType::Sword), 1000.05),
         (ItemType::Weapon(WeaponType::Axe), 0.05),
         (ItemType::HealthPotion, 0.15),
         (ItemType::ManaPotion, 0.15),
@@ -280,8 +280,8 @@ pub fn roll_item_stats(_monster_level: u32, item_type: ItemType) -> Option<Vec<S
                 {
                     continue;
                 }
+                // always add damage attribute
                 if distribution.sample(&mut rng) {
-                    // no need option
                     item_stats.push(Stat {
                         attribute_type: weapon_attribute.attribute_type,
                         value: rng.gen_range(weapon_attribute.min..weapon_attribute.max),

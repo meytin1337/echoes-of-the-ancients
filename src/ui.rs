@@ -11,7 +11,7 @@ impl Plugin for UiPlugin {
             .add_systems(OnExit(GameState::Inventory), disable_inventory)
             .add_systems(OnEnter(GameState::CharacterMenu), enable_character_menu)
             .add_systems(OnExit(GameState::CharacterMenu), disable_character_menu)
-            .add_systems(Update, (show_inventory, show_character_menu))
+            .add_systems(First, (show_inventory, show_character_menu))
             .insert_resource(Inventory::default())
             .insert_resource(CharacterMenu{is_window_open: false});
     }

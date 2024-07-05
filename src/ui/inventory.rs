@@ -52,7 +52,9 @@ pub fn show_inventory(
                     });
                     if ui.button("Unequip").clicked() {
                         commands.entity(entity).remove::<EquippedItem>();
-                        unequip_item_event.send(UnequipItemEvent {});
+                        unequip_item_event.send(UnequipItemEvent {
+                            item_type: item.item_type
+                        });
                     }
                 });
             }
@@ -84,8 +86,9 @@ pub fn show_inventory(
                             }
                             if ui.button("Equip").clicked() {
                                 commands.entity(entity).insert(EquippedItem);
-                                equip_item_event.send(EquipItemEvent);
-                                println!("Equipped item");
+                                equip_item_event.send(EquipItemEvent {
+                                    item_type: item.item_type
+                                });
                                 for (equipped_entity, equipped_item) in equipped_item_query.iter() {
                                     // if another item of the same type is equipped, remove it
                                     if entity != equipped_entity
